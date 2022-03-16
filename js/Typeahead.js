@@ -43,8 +43,9 @@ export default class Typeahead {
     }
 
     onInputFocus() {
-        this.toggleOptionsVisibility(true);
         this.filteredData = this.data;
+        this.toggleOptionsVisibility(true);
+        this.updateOptions();
         this.updateInputValue('');
     }
 
@@ -58,8 +59,7 @@ export default class Typeahead {
             this.updateFocusOption(options);
         } else if (e.keyCode === 13) {
             if (this.currentFocus === -1) {
-                this.updateInputValue('');
-                this.toggleOptionsVisibility(true);
+                this.onInputFocus();
                 return;
             }
             this.removeFocus(options);
