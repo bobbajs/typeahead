@@ -3,6 +3,7 @@ export default class Typeahead {
         this.element = element;
         this.data = data.sort();
         this.filteredData = data;
+        this.currentFocus = -1;
 
         this.element.innerHTML = `
             <input class="typeahead__input" id="input">
@@ -14,6 +15,7 @@ export default class Typeahead {
         const inputElement = this.element.querySelector('#input');
         inputElement.addEventListener('input', this.onInputChange.bind(this));
         inputElement.addEventListener('focus', this.onInputFocus.bind(this));
+        inputElement.addEventListener('keydown', this.onInputKeydown.bind(this));
 
         document.addEventListener('click', this.handleOutsideClick.bind(this));
     }
@@ -42,7 +44,44 @@ export default class Typeahead {
 
     onInputFocus() {
         this.toggleOptionsVisibility(true);
+        this.filteredData = this.data;
         this.updateInputValue('');
+    }
+
+    onInputKeydown(e) {
+        const options = this.element.querySelectorAll('.typeahead__option-item');
+        if (e.keyCode === 40) {
+            this.currentFocus++;
+            this.updateFocusOption(options);
+        } else if (e.keyCode === 38) {
+            this.currentFocus--;
+            this.updateFocusOption(options);
+        } else if (e.keyCode === 13) {
+            if (this.currentFocus === -1) {
+                this.updateInputValue('');
+                this.toggleOptionsVisibility(true);
+                return;
+            }
+            this.removeFocus(options);
+            this.updateInputValue(options[this.currentFocus].getAttribute('data-value'));
+            this.currentFocus = -1;
+            this.toggleOptionsVisibility(false);
+        } else if (e.keyCode === 27) {
+            this.toggleOptionsVisibility(false)
+        }
+    }
+
+    updateFocusOption(options) {
+        this.removeFocus(options);
+
+        if (this.currentFocus < 0) return;
+        if (this.currentFocus >= options.length) this.currentFocus = 0;
+
+        options[this.currentFocus].classList.add('active');
+    }
+
+    removeFocus(options) {
+        (options || []).forEach(option => option.classList.remove('active'));
     }
 
     updateInputValue(newValue) {
