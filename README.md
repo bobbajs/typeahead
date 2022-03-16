@@ -1,5 +1,5 @@
 # typeahead
-Simple typeahead implementation in JS
+Simple typeahead implementation in pure vanilla JS
 * Fetch a list of countries
 * Keyboard friendly
 
